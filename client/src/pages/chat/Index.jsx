@@ -1,6 +1,5 @@
-import React from 'react'
 
-function Chat() {
+const Chat = () => {
     return (
         <div>Chat</div>
     )
