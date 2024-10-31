@@ -1,6 +1,6 @@
 import mongoose from "mongoose"
 import { genSalt } from "bcrypt"
-const userSchema = new mongoose.userSchema({
+const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: [true, "Email is Required."],
