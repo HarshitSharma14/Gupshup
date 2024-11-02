@@ -14,6 +14,24 @@ const Auth = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
+    const validateLogin = () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email.length) {
+            toast.error("Email is required.")
+            return false
+        }
+        if (!emailRegex.test(email)) {
+            toast.error("Please enter a valid email.");
+            return false;
+        }
+        if (!password.length) {
+            toast.error("Passowrd is required.")
+            return false
+        }
+
+        return true
+    }
+
     const validateSignup = () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!email.length) {
@@ -35,12 +53,34 @@ const Auth = () => {
         return true
     }
 
-    const handleLogin = async () => { };
+    const handleLogin = async () => {
+        if (validateLogin()) {
+
+        }
+    };
 
     const handleSignup = async () => {
         if (validateSignup()) {
-            const response = await apiClient.post(SIGNUP_ROUTE, { email, password })
-            console.log({ response })
+            try {
+                const response = await apiClient.post(SIGNUP_ROUTE, { email, password }, { withCredentials: true })
+
+                console.log({ response })
+            }
+            catch (e) {
+                if (e.response) {
+                    // Check for the specific status code
+                    if (e.response.status === 409) {
+                        toast.error("User has already signed up. Try logging in."); // Provide feedback for existing user
+                    } else {
+                        toast.error("An unexpected error occurred. Please try again."); // General error handling
+                    }
+                } else {
+                    toast.error("Network error. Please check your connection."); // Handle network errors
+                }
+                console.log({ e });
+            }
+
+
         }
     };
 
