@@ -50,7 +50,7 @@ export const login = async (request, response, next) => {
 
         const auth = await compare(password, user.password)
         if (!auth) {
-            return response.status(400).send("Password is incorrect.")
+            return response.status(401).send("Password is incorrect.")
         }
 
         response.cookie("jwt", createToken(email, user.id), {

@@ -4,6 +4,6 @@ import { login, signup } from "../controllers/AuthController.js";
 const authRoutes = Router();
 
 authRoutes.post("/signup", signup)
-authRoutes.post("/signup", login)
+authRoutes.post("/login", login)
 
 export default authRoutes;
