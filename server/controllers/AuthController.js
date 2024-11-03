@@ -75,3 +75,23 @@ export const login = async (request, response, next) => {
         return response.status(500).send("Internal Server Error")
     }
 }
+
+export const getUserInfo = async (request, response, next) => {
+    try {
+        // return response.status(200).json({
+        //     user: {
+        //         id: user.id,
+        //         email: user.email,
+        //         profileSetup: user.profileSetup,
+        //         firstName: user.firstName,
+        //         lastName: user.lastName,
+        //         image: user.image,
+        //         color: user.color
+        //     }
+        // })
+
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send("Internal Server Error")
+    }
+}
