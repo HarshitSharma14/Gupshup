@@ -71,7 +71,6 @@ const Auth = () => {
                         navigate("/profile")
                     }
                 }
-
                 console.log(response)
             }
             catch (e) {

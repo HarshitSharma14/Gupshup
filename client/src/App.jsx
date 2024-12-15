@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from './components/ui/button'
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
 import Auth from './pages/auth/Index'
@@ -31,10 +31,19 @@ const App = () => {
         const response = await apiClient.get(GET_USER_INFO, {
           withCredentials: true
         })
+        if (response.status === 200 && response.data.id) {
+          setUserInfo(response.data)
+        }
+        else {
+          setUserInfo(undefined)
+        }
         console.log({ response })
       }
-      catch (e) {
-        console.log({ e })
+      catch (error) {
+        setUserInfo(undefined)
+      }
+      finally {
+        setLoading(false)
       }
     }
     if (!userInfo) {
