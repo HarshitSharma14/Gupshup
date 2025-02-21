@@ -92,7 +92,7 @@ const Logo = () => {
                     fill="#a16ee8"
                 ></path>{" "}
             </svg>
-            <span className="text-3xl font-semibold ">Gupshup</span>
+            <span className="text-3xl font-semibold ">गपशप</span>
         </div>
     );
 };
