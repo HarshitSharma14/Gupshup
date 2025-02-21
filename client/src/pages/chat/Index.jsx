@@ -41,6 +41,9 @@ const Chat = () => {
                     </h5>
                 </div>
             }
+            {
+
+            }
             <ContactsContainer />
             {selectedChatType === undefined ? (<EmptyChatContainer />) : (<ChatContainer />)}
 

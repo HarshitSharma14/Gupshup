@@ -7,6 +7,25 @@ export const createChatSlice = (set, get) => ({
     isDownloading: false,
     fileUploadProgress: 0,
     fileDownloadProgress: 0,
+    newMessageFrom: undefined,
+    setNewMessageFrom: (message) => {
+        const currUser = get().userInfo.id
+        const selectedChatData = get().selectedChatData
+        var selectedChat
+        if (selectedChatData !== undefined) {
+            selectedChat = get().selectedChatData._id
+        }
+        else {
+            selectedChat = -1
+        }
+        const mSender = message.sender._id
+        if ((currUser !== mSender) && (selectedChat !== mSender)) {
+            set({ newMessageFrom: mSender })
+        }
+    },
+    noNewMessage: () => set({
+        newMessageFrom: undefined
+    }),
     channels: [],
     setChannels: (channels) => set({ channels }),
 

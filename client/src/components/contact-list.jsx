@@ -5,10 +5,13 @@ import { Avatar, AvatarImage } from "@radix-ui/react-avatar"
 
 const ContactList = ({ contacts, isChannel = false }) => {
 
-    const { selectedChatData, setSelectedChatData, setSelectedChatType, selectedChatType, setSelectedChatMessages
+    const { selectedChatData, noNewMessage, newMessageFrom, setSelectedChatData, setSelectedChatType, selectedChatType, setSelectedChatMessages
     } = useAppStore()
 
     const handleClick = (contact) => {
+        if (newMessageFrom === contact._id) {
+            noNewMessage()
+        }
         if (isChannel) setSelectedChatType("channel")
         else setSelectedChatType("contact")
         setSelectedChatData(contact)
@@ -46,6 +49,11 @@ const ContactList = ({ contacts, isChannel = false }) => {
                         }
                         {
                             isChannel ? <span>{contact.name}</span> : <span>{selectedChatType === "contact" && contact.firstName ? `${contact.firstName} ${contact.lastName}` : `${contact.email}`}</span>
+                        }
+                        {
+                            newMessageFrom === contact._id ? (
+                                <div className="w-3 h-3 bg-green-500 rounded-full ml-auto mr-4">
+                                </div>) : ""
                         }
 
 

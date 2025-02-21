@@ -20,7 +20,7 @@ const MessageContainer = () => {
     const [imageURL, setImageURL] = useState(null)
 
     useEffect(() => {
-        const getMessages = async () => {
+        const getMessages = async () => {   
             try {
                 const response = await apiClient.post(GET_ALL_MESSAGES_ROUTE,
                     { id: selectedChatData._id }, { withCredentials: true })
@@ -50,6 +50,7 @@ const MessageContainer = () => {
             if (selectedChatType === "contact") getMessages()
             else if (selectedChatType === "channel") getChannelMessages()
         }
+
 
     }, [selectedChatData, selectedChatType, setSelectedChatMessages])
 

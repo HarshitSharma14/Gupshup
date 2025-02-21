@@ -9,7 +9,7 @@ import CreateChannel from "./components/create-channel/Index";
 
 const ContactsContainer = () => {
 
-    const { setDirectMessagesContacts, directMessagesContacts, channels, setChannels } = useAppStore()
+    const { setDirectMessagesContacts, setNewMessageFrom, noNewMessage, directMessagesContacts, channels, setChannels } = useAppStore()
 
     useEffect(() => {
         const getContacts = async () => {
@@ -30,7 +30,7 @@ const ContactsContainer = () => {
         }
         getContacts()
         getChannels()
-    }, [setChannels, setDirectMessagesContacts])
+    }, [setChannels, setDirectMessagesContacts, setNewMessageFrom, noNewMessage])
 
     return (
         <div className="relative md:w-[35vw] lg:w-[30vw] xl:w-[20vw] bg-[#1b1c24] border-r-2 border-[rgb(47,48,59)] w-full">
@@ -92,7 +92,7 @@ const Logo = () => {
                     fill="#a16ee8"
                 ></path>{" "}
             </svg>
-            <span className="text-3xl font-semibold ">Syncronus</span>
+            <span className="text-3xl font-semibold ">Gupshup</span>
         </div>
     );
 };

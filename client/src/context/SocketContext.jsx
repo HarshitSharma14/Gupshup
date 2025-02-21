@@ -23,11 +23,13 @@ export const SocketProvider = ({ children }) => {
                 console.log("Connected to socket server")
             })
             const handleRecieveMessage = (message) => {
-                const { selectedChatData, selectedChatType, addMessage, addContactsInDmContacts } = useAppStore.getState()
+                const { selectedChatData, selectedChatType, newMessageFrom, addMessage, setNewMessageFrom, addContactsInDmContacts } = useAppStore.getState()
                 if (selectedChatType !== undefined && (selectedChatData._id === message.sender._id || selectedChatData._id === message.recipient._id)) {
                     addMessage(message)
                     // console.log(message)
                 }
+                setNewMessageFrom(message)
+                console.log(newMessageFrom)
                 addContactsInDmContacts(message)
             }
 
