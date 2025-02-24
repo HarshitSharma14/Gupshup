@@ -29,7 +29,7 @@ const ProfileInfo = () => {
                 <div className="w-12 h-12 relative ">
                     <Avatar className="h-12 w-12  rounded-full overflow-hidden">
                         {
-                            userInfo.image ? (<AvatarImage src={`${HOST}/${userInfo.image}`} alt="profile" className="object-cover w-full h-full bg-black" />) :
+                            userInfo.image ? (<AvatarImage src={`${userInfo.image}`} alt="profile" className="object-cover w-full h-full bg-black" />) :
                                 (
                                     <div className={`h-12 w-12 uppercase  text-lg border-[1px] flex items-center justify-center rounded-full ${getColor(userInfo.color)}`}>
                                         {

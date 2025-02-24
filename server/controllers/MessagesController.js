@@ -1,5 +1,6 @@
 import Message from "../models/MessagesModel.js"
 import { mkdirSync, renameSync } from 'fs'
+import { uploadAttachment } from "../utils/features.js"
 export const getMessages = async (request, response, next) => {
     try {
         const user1 = request.userId
@@ -32,17 +33,27 @@ export const uploadFile = async (request, response, next) => {
         if (!request.file) {
             return response.status(400).send('No file uploaded.')
         }
-        const date = Date.now()
-        let fileDir = `uploads/files/${date}`
-        let fileName = `${fileDir}/${request.file.originalname}`
+        console.log('init')
 
-        mkdirSync(fileDir, { recursive: true })
+        const fileUrl = await uploadAttachment(request)
+        console.log('init2')
 
-        renameSync(request.file.path, fileName)
+        return response.status(200).json({ fileUrl })
 
-        return response.status(200).json({ filePath: fileName })
+        // const date = Date.now()
+        // let fileDir = `uploads/files/${date}`
+        // let fileName = `${fileDir}/${request.file.originalname}`
+
+        // mkdirSync(fileDir, { recursive: true })
+
+        // renameSync(request.file.path, fileName)
+
+        // return response.status(200).json({ filePath: fileName })
 
     } catch (error) {
+        if (error.http_code === 400) {
+            return response.status(401).send('File is too large.')
+        }
         console.log(error);
         return response.status(500).send("Internal Server Error")
     }

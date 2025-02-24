@@ -7,7 +7,7 @@ import { Tabs, TabsList } from "@/components/ui/tabs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client"
-import { LOGIN_ROUTE, SIGNUP_ROUTE } from "@/utils/constants";
+import { LOGIN_ROUTE, SEND_OTP_ROUTE, SIGNUP_ROUTE, VERIFY_OTP_ROUTE } from "@/utils/constants";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/store";
 const Auth = () => {
@@ -17,8 +17,10 @@ const Auth = () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-
+    const [otp, setOtp] = useState("");
+    const [otpVerified, setOtpVerified] = useState(false)
+    const [otpSent, setOtpSent] = useState(false)
+    const [disableButton, setDisableButton] = useState(false)
     const validateLogin = () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!email.length) {
@@ -58,7 +60,38 @@ const Auth = () => {
         return true
     }
 
+    const sendOtp = async () => {
+        setDisableButton(true)
+        const toastId = toast.loading("Sending OTP...");
+        console.log('init')
+        if (validateSignup) {
+            try {
+                const response = await apiClient.post(SEND_OTP_ROUTE, { email })
+                if (response.status === 200) {
+                    toast.success("OTP sent successfully!", { id: toastId });
+                    console.log('sent')
+                    setOtpSent(true)
+                }
+                else {
+                    toast.error("Failed to send OTP", { id: toastId });
+                }
+                console.log('idk why')
+            }
+            catch (e) {
+                if (e.status === 409) {
+                    toast.error("User already signed up. Please Log in!", { id: toastId });
+                }
+                else {
+                    toast.error("Something went wrong!", { id: toastId });
+                }
+            }
+        }
+        console.log('here')
+        setDisableButton(false)
+    }
+
     const handleLogin = async () => {
+        setDisableButton(true)
         if (validateLogin()) {
             try {
                 const response = await apiClient.post(LOGIN_ROUTE, { email, password }, { withCredentials: true })
@@ -88,40 +121,62 @@ const Auth = () => {
                 }
             }
         }
+        setDisableButton(false)
     };
 
+    const verifyOtp = async () => {
+        setDisableButton(true)
+        const toastId = toast.loading("Verifying OTP..."); // Show loading toast
+
+        try {
+            const response = await apiClient.post(VERIFY_OTP_ROUTE, { otp, email })
+
+            if (response.status === 200) {
+                toast.success("OTP verified! Set password.", { id: toastId });
+                setOtpVerified(true)
+            }
+            else {
+                toast.error(data.error || "Failed to verify OTP", { id: toastId });
+            }
+        }
+        catch (e) {
+            toast.error("Something went wrong!", { id: toastId });
+        }
+        setDisableButton(false)
+    }
+
     const handleSignup = async () => {
-        if (validateSignup()) {
-            try {
-                const response = await apiClient.post(SIGNUP_ROUTE, { email, password }, { withCredentials: true })
+        setDisableButton(true)
 
-                if (response.status === 201) {
-                    setUserInfo(response.data.user)
-                    navigate("/profile")
-                }
+        try {
+            const response = await apiClient.post(SIGNUP_ROUTE, { email, password }, { withCredentials: true })
 
-                console.log({ response })
-
-            }
-            catch (e) {
-                if (e.response) {
-                    if (e.response.status === 409) {
-                        toast.error("User has already signed up. Try logging in.");
-                    } else {
-                        toast.error("An unexpected error occurred. Please try again."); // General error handling
-                    }
-                } else {
-                    toast.error("Network error. Please check your connection."); // Handle network errors
-                }
+            if (response.status === 201) {
+                setUserInfo(response.data.user)
+                navigate("/profile")
             }
 
+            console.log({ response })
 
         }
+        catch (e) {
+            if (e.response) {
+                if (e.response.status === 409) {
+                    toast.error("User has already signed up. Try logging in.");
+                } else {
+                    toast.error("An unexpected error occurred. Please try again."); // General error handling
+                }
+            } else {
+                toast.error("Network error. Please check your connection."); // Handle network errors
+            }
+        }
+        setDisableButton(false)
+
     };
 
     return (
         <div className="h-[100vh] w-[100vw] flex items-center justify-center" >
-            <div className="h-[80vh] bg-white border-2 border-white text-opacity-90 shadow-2xl w-[80vw] md:w-[90vw] lg:w-[70vw] xl:w-[60vw] rounded-3xl grid xl:grid-cols-2" >
+            <div className="h-[80vh]  border-2 bg-white border-white text-opacity-90 shadow-2xl w-[80vw] md:w-[90vw] lg:w-[70vw] xl:w-[60vw] rounded-3xl grid xl:grid-cols-2 " >
                 <div className="flex flex-col gap-10 items-center justify-center">
                     <div className="flex items-center justify-center flex-col">
                         <div className="flex items-center justify-center">
@@ -146,25 +201,27 @@ const Auth = () => {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)} />
 
-                                <Button className="rounded-full p-6" onClick={handleLogin}>Login</Button>
+                                <Button className="rounded-full p-6 bg-purple-500" onClick={handleLogin} disabled={disableButton}>Login</Button>
                             </TabsContent>
                             <TabsContent className="flex flex-col gap-5 " value="signup">
                                 <Input placeholder="Email" type="email" className="rounded-full p-6"
                                     value={email}
-                                    onChange={(e) => setEmail(e.target.value)} />
-                                <Input placeholder="Password" type="password" className="rounded-full p-6"
+                                    onChange={(e) => setEmail(e.target.value)} disabled={otpSent} />
+                                <div className={`${otpSent && !otpVerified ? "block" : "hidden"} mx-auto`}>OTP expires in 3 minutes.</div>
+                                <Input placeholder="OTP" type="text" className={`rounded-full p-6 ${otpSent ? "block" : "hidden"} ${otpVerified ? "hidden" : ""}`}
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value)} />
+                                <Input placeholder="Password" type="password" className={`rounded-full p-6 ${otpVerified ? "block" : "hidden"}`}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)} />
-                                <Input placeholder="Confirm Password" type="password" className="rounded-full p-6"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)} />
-                                <Button className="rounded-full p-6" onClick={handleSignup}>Signup</Button>
+                                <Button className={`rounded-full p-6 pb-10 bg-purple-500 ${otpSent ? "hidden" : "block"}`} onClick={sendOtp} disabled={disableButton}>Send OTP</Button>
+                                <Button className={`rounded-full p-6 bg-purple-500 ${otpSent ? "block" : "hidden"} `} onClick={() => { otpVerified ? handleSignup() : verifyOtp() }} disabled={disableButton}>{`${otpVerified ? "Signup" : "Verify OTP"}`}</Button>
                             </TabsContent>
                         </Tabs>
                     </div>
                 </div>
-                <div className="hidden xl:flex justify-center items-center">
-                    <img src={Background} alt="background login" className="h-[700px]" />
+                <div className="hidden xl:flex justify-center items-center ">
+                    <img src={Background} alt="background login" className="h-[500px] object-contain" />
                 </div>
             </div>
         </div>

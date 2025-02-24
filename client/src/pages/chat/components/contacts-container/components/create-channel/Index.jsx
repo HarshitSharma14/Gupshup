@@ -27,6 +27,9 @@ const CreateChannel = () => {
 
     const { setSelectedChatType, setSelectedChatData, addChannel } = useAppStore()
 
+    const [isDropdownOpen, setDropdownOpen] = useState(false);
+
+
     const [newChannelModal, setNewChannelModal] = useState(false);
 
 
@@ -97,17 +100,29 @@ const CreateChannel = () => {
                         />
                     </div>
                     <div>
-                        <MultipleSelector className="rounded-lg bg-[#2c2e3b] border-none py-2 text-white" defaultOptions={allContacts} placeholder="Search Contacts" value={selectedContacts} onChange={setSelectedContacts} emptyIndicator={
-                            <p className="text-center text-lg leading-10 text-gray-600">
-                                No results found.
-                            </p>
-                        } />
+                        {/* <h1 className="bg-red">{isDropdownOpen ? "dd" : "aa"}</h1> */}
                     </div>
-                    <div>
-                        <Button className="w-full bg-purple-700 hover:bg-purple-900 transition-all duration-300" onClick={createChannel}>
+                    <div className=" ">
+                        <MultipleSelector
+                            open={isDropdownOpen} // Control open state
+                            onOpenChange={setDropdownOpen}
+                            className=" z-50 rounded-lg bg-[#2c2e3b] border-none py-2 text-white" defaultOptions={allContacts} placeholder="Search Contacts" value={selectedContacts} onChange={setSelectedContacts}
+                            emptyIndicator={
+                                <p className="text-center text-lg leading-10 text-gray-600">
+                                    No results found.
+                                </p>
+                            }
+                            style={{ backgroundColor: "#2c2e3b !important" }} // FORCE background color
+                        />
+                    </div>
+                    {!isDropdownOpen && (
+                        <Button
+                            className="w-full bg-purple-700 hover:bg-purple-900 transition-all duration-300"
+                            onClick={createChannel}
+                        >
                             Create Channel
                         </Button>
-                    </div>
+                    )}
 
                 </DialogContent>
             </Dialog>

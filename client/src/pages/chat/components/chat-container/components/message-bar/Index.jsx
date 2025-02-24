@@ -7,11 +7,12 @@ import { useState, useRef, useEffect } from "react";
 import { GrAttachment } from 'react-icons/gr'
 import { IoSend } from "react-icons/io5";
 import { RiEmojiStickerLine } from "react-icons/ri";
+import { toast } from "sonner";
 const MessageBar = () => {
     const socket = useSocket()
     const fileInputRef = useRef()
     const [message, setMessage] = useState('');
-    const { selectedChatType, selectedChatData, userInfo, setIsUploading, setFileUploadProgress } = useAppStore()
+    const { selectedChatType, selectedChatData, userInfo, setIsUploading, isDownloading, isUploading, setFileUploadProgress } = useAppStore()
     const emojiRef = useRef()
     const [emojiPickerOpen, setEmojiPickerOpen] = useState(false)
 
@@ -62,8 +63,10 @@ const MessageBar = () => {
 
     const handleAttachmentChange = async (event) => {
         try {
+            console.log('init')
             const file = event.target.files[0]
             if (file) {
+                console.log('init2')
                 const formData = new FormData()
                 formData.append('file', file)
                 setIsUploading(true)
@@ -71,8 +74,12 @@ const MessageBar = () => {
                     withCredentials: true,
                     onUploadProgress: data => {
                         setFileUploadProgress(Math.round((100 * data.loaded) / data.total))
-                    }
+                    },
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
                 })
+                console.log('uploaded')
 
 
                 if (response.status === 200 && response.data) {
@@ -83,7 +90,7 @@ const MessageBar = () => {
                             content: undefined,
                             recipient: selectedChatData._id,
                             messageType: "file",
-                            fileUrl: response.data.filePath
+                            fileUrl: response.data.fileUrl
                         })
                     }
                     else if (selectedChatType === "channel") {
@@ -91,7 +98,7 @@ const MessageBar = () => {
                             sender: userInfo.id,
                             content: undefined,
                             messageType: "file",
-                            fileUrl: response.data.filePath,
+                            fileUrl: response.data.fileUrl,
                             channelId: selectedChatData._id
                         })
                     }
@@ -101,8 +108,14 @@ const MessageBar = () => {
             // console.log({ file })
         }
         catch (error) {
+            if (error.response.status === 401) {
+                toast.error("File is too large")
+            }
             setIsUploading(false)
             console.log(error)
+        } finally {
+            // Clear the file input field
+            event.target.value = ""
         }
     }
 
@@ -125,9 +138,9 @@ const MessageBar = () => {
                 <input type="file" className="hidden" ref={fileInputRef} onChange={handleAttachmentChange} />
                 <div className="relative">
                     <button className="text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all" onClick={() => setEmojiPickerOpen(true)}>
-                        <RiEmojiStickerLine className="text-2xl" />
+                        <RiEmojiStickerLine className={`text-2xl ${isDownloading || isUploading ? "hidden" : ""}`} />
                     </button>
-                    <div className="absolute bottom-16 right-8" ref={emojiRef}>
+                    <div className=" bottom-16 right-8" ref={emojiRef}>
                         <EmojiPicker theme="dark" open={emojiPickerOpen}
                             onEmojiClick={handleAddEmoji} autoFocusSearch={false} />
                     </div>

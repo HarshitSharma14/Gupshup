@@ -20,7 +20,7 @@ const MessageContainer = () => {
     const [imageURL, setImageURL] = useState(null)
 
     useEffect(() => {
-        const getMessages = async () => {   
+        const getMessages = async () => {
             try {
                 const response = await apiClient.post(GET_ALL_MESSAGES_ROUTE,
                     { id: selectedChatData._id }, { withCredentials: true })
@@ -71,7 +71,7 @@ const MessageContainer = () => {
     const downloadFile = async (url) => {
         setIsDownloading(true)
         setFileDownloadProgress(0)
-        const response = await apiClient.get(`${HOST}/${url}`, {
+        const response = await apiClient.get(`${url}`, {
             responseType: "blob",
             onDownloadProgress: (progressEvent) => {
                 const { loaded, total } = progressEvent
@@ -136,12 +136,12 @@ const MessageContainer = () => {
                         setShowImage(true)
                         setImageURL(message.fileUrl)
                     }}>
-                        <img src={`${HOST}/${message.fileUrl}`} height={300} width={300} />
-                    </div>) : (<div className="flex items-center justify-center gap-4">
+                        <img src={`${message.fileUrl}`} height={300} width={300} />
+                    </div>) : (<div className="flex items-center justify-center gap-4 flex-wrap xl:flex-nowrap shrink">
                         <span className="text-white/8- text-3xl bg-black/20 rounded-full p-3">
                             <MdFolderZip />
                         </span>
-                        <span>{message.fileUrl.split("/").pop()}</span>
+                        <span className="w-full break-words">{message.fileUrl.split("/").pop()}</span>
                         <span className="bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300"
                             onClick={() => downloadFile(message.fileUrl)}>
                             <IoMdArrowRoundDown />
@@ -172,7 +172,7 @@ const MessageContainer = () => {
                         setShowImage(true)
                         setImageURL(message.fileUrl)
                     }}>
-                        <img src={`${HOST}/${message.fileUrl}`} height={300} width={300} />
+                        <img src={`${message.fileUrl}`} height={300} width={300} />
                     </div>) : (<div className="flex items-center justify-center gap-4">
                         <span className="text-white/8- text-3xl bg-black/20 rounded-full p-3">
                             <MdFolderZip />
@@ -189,7 +189,7 @@ const MessageContainer = () => {
                         <Avatar className="h-8 w-8  rounded-full overflow-hidden">
                             {
                                 message.sender.image && (
-                                    <AvatarImage src={`${HOST}/${message.sender.image}`} alt="profile" className="object-cover w-full h-full bg-black" />
+                                    <AvatarImage src={`${message.sender.image}`} alt="profile" className="object-cover w-full h-full bg-black" />
                                 )}
 
 

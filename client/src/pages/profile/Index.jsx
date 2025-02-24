@@ -28,7 +28,7 @@ const Profile = () => {
             setSelectedColor(userInfo.color)
         }
         if (userInfo.image) {
-            setImage(`${HOST}/${userInfo.image}`)
+            setImage(`${userInfo.image}`)
         }
     }, [userInfo])
 
@@ -79,16 +79,28 @@ const Profile = () => {
         if (file) {
             const formData = new FormData()
             formData.append("profile-image", file)
-            const response = await apiClient.post(ADD_PROFILE_IMAGE_ROUTE, formData, { withCredentials: true })
+            const response = await apiClient.post(ADD_PROFILE_IMAGE_ROUTE, formData,
+                {
+                    withCredentials: true,
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    }
+                }
+
+            )
             if (response.status === 200 && response.data.image) {
+                console.log(response.data.image)
                 setUserInfo({ ...userInfo, image: response.data.image })
+                setImage(response.data.image)
                 toast.success("Image updated successfully.")
+            } else {
+                toast.error("Failed to update image.")
             }
-            const reader = new FileReader()
-            reader.onload = () => {
-                setImage(reader.result)
-            }
-            reader.readAsDataURL(file)
+            // const reader = new FileReader()
+            // reader.onload = () => {
+            //     setImage(reader.result)
+            // }
+            // reader.readAsDataURL(file)
         }
     }
     const handleDeleteImage = async () => {

@@ -93,7 +93,7 @@ const NewDM = () => {
                                             <div className="w-12 h-12 relative ">
                                                 <Avatar className="h-12 w-12  rounded-full overflow-hidden">
                                                     {
-                                                        contact.image ? (<AvatarImage src={`${HOST}/${contact.image}`} alt="profile" className="object-cover w-full h-full bg-black rounded-full" />) :
+                                                        contact.image ? (<AvatarImage src={`${contact.image}`} alt="profile" className="object-cover w-full h-full bg-black rounded-full" />) :
                                                             (
                                                                 <div className={`h-12 w-12 uppercase  text-lg border-[1px] flex items-center justify-center rounded-full ${getColor(contact.color)}`}>
                                                                     {

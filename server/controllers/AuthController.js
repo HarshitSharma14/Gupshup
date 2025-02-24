@@ -1,23 +1,65 @@
+import "dotenv/config";
 import User from "../models/UserModel.js";
 import jwt from "jsonwebtoken"
 import { compare } from "bcrypt";
 import { renameSync, unlinkSync } from "fs"
+import { deleteProfileImageByUrl, uploadProfileImage } from "../utils/features.js";
+import nodemailer from "nodemailer"
+import { redis } from "../index.js";
+import crypto from "crypto"
+import { request } from "http";
+
+
+const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
+
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
 const createToken = (email, userId) => {
     return jwt.sign({ email, userId }, process.env.JWT_KEY, { expiresIn: maxAge })
 }
 
-export const signup = async (request, response, next) => {
+
+
+export const signupOtp = async (request, response, next) => {
     try {
-        const { email, password } = request.body;
-        if (!email || !password) {
-            return response.status(400).send("Please enter both email and password");
+        const { email } = request.body;
+        if (!email) {
+            return response.status(400).send("Please enter email ID");
         }
         const user1 = await User.findOne({ email })
         if (user1) {
             return response.status(409).send("User has already signed up. Try logging in.")
         }
+        const otp = crypto.randomInt(100000, 999999).toString();
+        await redis.set(`otp:${email}`, otp, "EX", 300); // Store OTP for 5 min
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Your OTP Code",
+            text: `Your OTP is ${otp}`,
+        };
+
+        await transporter.sendMail(mailOptions);
+        return response.status(200).json({ message: "OTP sent" });
+
+
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send("Internal Server Error")
+    }
+}
+
+export const signup = async (request, response, next) => {
+    try {
+        const { email, password } = request.body
+
         const user = await User.create({ email, password })
         response.cookie("jwt", createToken(email, user.id), {
             maxAge,
@@ -31,10 +73,28 @@ export const signup = async (request, response, next) => {
                 profileSetup: user.profileSetup,
             }
         })
+    }
+    catch (e) {
+        console.log(e)
+    }
+}
 
-    } catch (error) {
-        console.log(error);
-        return response.status(500).send("Internal Server Error")
+export const signupVerify = async (request, response, next) => {
+    try {
+        console.log('init')
+        const { otp, email } = request.body
+        if (!otp || !email) {
+            return response.status(400).send("Please send email, password and OTP.")
+        }
+        const storedOtp = await redis.get(`otp:${email}`);
+        if (!storedOtp) return response.status(400).json({ error: "OTP expired or invalid" });
+        if (storedOtp !== otp) return response.status(400).json({ error: "Incorrect OTP" });
+
+        await redis.del(`otp:${email}`); // Remove OTP after verification
+        return response.status(200).json({ message: "OTP verified successfully" });
+    }
+    catch (e) {
+        console.log(e)
     }
 }
 
@@ -149,12 +209,14 @@ export const addProfileImage = async (request, response, next) => {
             return response.status(400).send("Please upload a file.")
         }
 
-        const date = Date.now()
-        let fileName = "uploads/profiles/" + date + "_" + request.file.originalname
-        renameSync(request.file.path, fileName)
+        const profileImage = await uploadProfileImage(request)
+
+        // const date = Date.now()
+        // let fileName = "uploads/profiles/" + date + "_" + request.file.originalname
+        // renameSync(request.file.path, fileName)
         const updatedUser = await User.findByIdAndUpdate(
             request.userId,
-            { image: fileName },
+            { image: profileImage },
             { new: true, runValidators: true })
 
         return response.status(200).json({
@@ -178,7 +240,7 @@ export const removeProfileImage = async (request, response, next) => {
         }
 
         if (user.image) {
-            unlinkSync(user.image)
+            deleteProfileImageByUrl(user.image)
         }
 
         user.image = null

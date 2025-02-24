@@ -8,16 +8,37 @@ import contactsRoutes from "./routes/ContactRoutes.js"
 import setupSocket from "./socket.js"
 import messagesRoutes from "./routes/MessagesRoutes.js"
 import channelRoutes from "./routes/ChannelRoutes.js"
+import cloudinary from "cloudinary";
+import Redis from "ioredis";
+
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 3001;
 const databaseURL = process.env.DATABASE_URL
+
+
+export const redis = new Redis(process.env.REDIS_URL, {
+    tls: { rejectUnauthorized: false }, // Allow self-signed certs
+    retryStrategy: (times) => Math.min(times * 50, 2000) // Exponential backoff
+});
+
+redis.on('connect', () => console.log('Connected to Redis on Render'));
+redis.on('error', (err) => console.error('Redis Error:', err));
 
 app.use(cors({
     origin: [process.env.ORIGIN],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
 }))
+
+//cloudinary config
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    timeout: 60 * 60 * 1000 * 4,
+});
+
 
 app.use(cookieParser())
 app.use(express.json())

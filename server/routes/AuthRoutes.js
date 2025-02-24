@@ -1,12 +1,14 @@
 import { Router } from "express"
-import { getUserInfo, login, signup, updateProfile, addProfileImage, removeProfileImage, logout } from "../controllers/AuthController.js";
+import { getUserInfo, login, signupOtp, signupVerify, signup, updateProfile, addProfileImage, removeProfileImage, logout } from "../controllers/AuthController.js";
 import { verifyToken } from "../middlewares/AuthMiddleware.js";
 import multer from "multer";
 
 
 const authRoutes = Router();
-const upload = multer({ dest: "uploads/profiles/" })
+const upload = multer({ storage: multer.memoryStorage() })
 
+authRoutes.post("/signupOtp", signupOtp)
+authRoutes.post("/signupVerify", signupVerify)
 authRoutes.post("/signup", signup)
 authRoutes.post("/login", login)
 authRoutes.get("/user-info", verifyToken, getUserInfo)
