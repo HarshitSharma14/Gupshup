@@ -17,10 +17,15 @@ const port = process.env.PORT || 3001;
 const databaseURL = process.env.DATABASE_URL
 
 
+// export const redis = new Redis(process.env.REDIS_URL, {
+//     tls: { rejectUnauthorized: false }, // Allow self-signed certs
+//     retryStrategy: (times) => Math.min(times * 50, 2000) // Exponential backoff
+// });
+
 export const redis = new Redis(process.env.REDIS_URL, {
-    tls: { rejectUnauthorized: false }, // Allow self-signed certs
     retryStrategy: (times) => Math.min(times * 50, 2000) // Exponential backoff
 });
+
 
 redis.on('connect', () => console.log('Connected to Redis on Render'));
 redis.on('error', (err) => console.error('Redis Error:', err));
