@@ -134,6 +134,8 @@ const Auth = () => {
             if (response.status === 200) {
                 toast.success("OTP verified! Set password.", { id: toastId });
                 setOtpVerified(true)
+                ////////////////////////
+                setPassword("")
             }
             else {
                 toast.error(data.error || "Failed to verify OTP", { id: toastId });

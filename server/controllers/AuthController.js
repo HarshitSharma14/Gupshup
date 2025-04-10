@@ -43,8 +43,21 @@ export const signupOtp = async (request, response, next) => {
             from: process.env.EMAIL_USER,
             to: email,
             subject: "Your OTP Code",
-            text: `Your OTP is ${otp}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                    <h2 style="color: #4A90E2;">Welcome to गपशप!</h2>
+                    <p style="font-size: 16px; color: #333;">Hi there,</p>
+                    <p style="font-size: 16px; color: #333;">Your OTP code is:</p>
+                    <div style="font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #4A90E2; margin: 20px 0;">
+                        ${otp}
+                    </div>
+                    <p style="font-size: 14px; color: #666;">This code will expire in 5 minutes. Please don't share it with anyone.</p>
+                    <hr style="margin: 20px 0;">
+                    <p style="font-size: 12px; color: #aaa;">If you didn't request this OTP, you can ignore this email.</p>
+                </div>
+            `
         };
+
 
         await transporter.sendMail(mailOptions);
         return response.status(200).json({ message: "OTP sent" });
