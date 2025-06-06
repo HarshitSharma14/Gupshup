@@ -5,17 +5,14 @@ A modern, real-time chat application built with the MERN stack (MongoDB, Express
 ![Chat Application](https://img.shields.io/badge/MERN-Stack-green)
 ![Real Time](https://img.shields.io/badge/Real--Time-Socket.io-blue)
 ![Authentication](https://img.shields.io/badge/Auth-JWT-orange)
-![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ## 🌟 Features
 
 - **Real-time Messaging** - Instant message delivery using Socket.io
 - **User Authentication** - Secure login/registration with JWT tokens
 - **Responsive Design** - Works seamlessly on desktop and mobile devices
-- **Online Status** - See who's currently online
 - **Message History** - Persistent chat history stored in MongoDB
 - **User-friendly Interface** - Clean and intuitive chat interface
-- **Typing Indicators** - See when someone is typing
 - **Emoji Support** - Express yourself with emojis
 - **Private Messaging** - One-on-one conversations
 - **Group Chats** - Create and join group conversations
@@ -156,7 +153,6 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 1. **Register/Login** - Create a new account or login with existing credentials
 2. **Start Chatting** - Join existing conversations or start new ones
 3. **Real-time Updates** - Messages appear instantly for all connected users
-4. **Online Status** - See who's currently active
 5. **Message History** - Scroll up to view previous messages
 
 ## 🔌 API Endpoints
@@ -176,35 +172,6 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 - `GET /api/users/online` - Get online users
 - `PUT /api/users/profile` - Update user profile
 
-## 🔥 Socket Events
-
-### Client Events
-- `join` - Join a chat room
-- `sendMessage` - Send a message
-- `typing` - User is typing
-- `stopTyping` - User stopped typing
-
-### Server Events
-- `newMessage` - New message received
-- `userOnline` - User came online
-- `userOffline` - User went offline
-- `typing` - Someone is typing
-- `stopTyping` - Stopped typing
-
-## 🎨 Screenshots
-
-*Add screenshots of your application here to showcase the UI*
-
-## 🚧 Roadmap
-
-- [ ] File sharing capabilities
-- [ ] Voice messages
-- [ ] Video calling integration
-- [ ] Message reactions
-- [ ] Dark/Light theme toggle
-- [ ] Message search functionality
-- [ ] Push notifications
-- [ ] Mobile app (React Native)
 
 ## 🤝 Contributing
 
@@ -215,10 +182,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 👨‍💻 Author
 
