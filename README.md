@@ -1,4 +1,4 @@
-# 💬 ChatApp MERN
+# 💬 Gupshup
 
 A modern, real-time chat application built with the MERN stack (MongoDB, Express.js, React, Node.js) featuring instant messaging, user authentication, and a responsive design.
 
